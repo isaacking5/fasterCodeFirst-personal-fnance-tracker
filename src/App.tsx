@@ -1,26 +1,51 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react"
 
-function App() {
+import GlobalStyles from "./Components/GlobalStyles"
+import TransactionForm from "./Components/TransactionFrom"
+import TransactionList from "./Components/TransactionList"
+import { Transaction } from "./Components/types"
+import { CurrentBalcWrapper, MainContainer } from "./styledComponents"
+
+const App: React.FC = () => {
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+
+  const handleAddTransaction = (transaction: Transaction) => {
+    setTransactions((prevTransactions) => [...prevTransactions, transaction])
+  }
+
+  const handleDeleteTransaction = (id: string) => {
+    setTransactions((prevTransactions) =>
+      prevTransactions.filter((transaction) => transaction.id !== id)
+    )
+  }
+
+  const getCurrentBalc = (): number => {
+    let currentBalc = 0
+    transactions.forEach((eachTransaction) => {
+      if (eachTransaction.type === "income") {
+        currentBalc += eachTransaction.amount
+      } else {
+        currentBalc -= eachTransaction.amount
+      }
+    })
+
+    return currentBalc
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <MainContainer>
+      <h1>Personal Finance Tracker</h1>
+      <TransactionForm onAddTransaction={handleAddTransaction} />
+      <TransactionList
+        transactions={transactions}
+        onDeleteTransaction={handleDeleteTransaction}
+      />
+      <CurrentBalcWrapper>
+        Current Balance: {getCurrentBalc()}
+      </CurrentBalcWrapper>
+      <GlobalStyles />
+    </MainContainer>
+  )
 }
 
-export default App;
+export default App
